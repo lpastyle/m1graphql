@@ -1,31 +1,30 @@
-const express = require('express');
-const { graphqlHTTP } = require('express-graphql');
-const { makeExecutableSchema } = require('@graphql-tools/schema')
-
-// Definir le schema 
+// Definir le schema de l'API
 const typeDef = `
   type Query {
     greeting: String
   }
 `
 
-// Implémenter un resolver
+// Implémenter le resolver
 const  resolver = {
     Query : {
        greeting: () => 'Hello GraphQL !!'
     }
  }
 
-// Rassembler le schema au resolver   
+// Rassembler le schema et le resolver  
+const { makeExecutableSchema } = require('@graphql-tools/schema')
 const executableSchema = makeExecutableSchema({
      typeDefs:typeDef,
      resolvers:resolver
 })
 
 // Créer une application ExpressJS
+const express = require('express');
 const app = express();
 
 // Configurer le point de terminaison GraphQL
+const { graphqlHTTP } = require('express-graphql');
 app.use('/graphql', graphqlHTTP({
   schema: executableSchema,
   graphiql: true, // Activer l'interface graphique interactive pour tester les requêtes
