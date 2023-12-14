@@ -1,0 +1,81 @@
+#
+# Unit Tests for "user" type
+# 
+
+mutation addFirstUser {
+  createUser(
+    name: "Laurent",
+    email: "laurent@ynov.com",
+    address: "1 place Sophie Laffitte",
+    zipcode: 6950,
+    license: 161261) {
+    name,
+    email
+    address,
+    zipcode,
+    license
+  }
+}
+
+mutation addSecondUser {
+createUser(
+    name: "Nadine",
+    email: "nadine@ynov.com",
+    address:"3 rue des fleurs",
+    zipcode: 75130,
+    license: 1891271) {
+    name,
+    email
+    address,
+    zipcode,
+    license
+  }
+}
+
+mutation addThirdUser {
+createUser(
+    name: "Sophie",
+    email: "sophie@ynov.com",
+    address:"12 impasse des muguets",
+    zipcode: 83100,
+    license: 225172) {
+    name,
+    email
+    address,
+    zipcode,
+    license
+  }
+}
+
+query showAllUser {
+  users {
+    id
+    name
+    zipcode
+    license
+  }
+}
+
+query showUserId_1 {
+  user(id: "1") {
+    id
+    name
+    email
+    address
+    zipcode
+    license
+  }
+}
+
+mutation updateUserId_1 {
+  updateUser(id: "1",
+    name: "Laurent",
+    email: "laurent@ynov.com",
+    address: "1 place Sophie Laffitte",
+    zipcode: 6480,
+    license: 1234567) 
+}
+
+mutation deleteUserId_3 {
+  deleteUser(id: "3")
+}

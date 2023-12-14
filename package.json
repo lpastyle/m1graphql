@@ -1,0 +1,19 @@
+{
+  "name": "m1graphql",
+  "version": "1.0.0",
+  "description": "TP GraphQL info m1",
+  "main": "posts.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-graphql": "^0.12.0",
+    "graphql": "^15.8.0",
+    "sqlite3": "^5.1.6"
+  }
+}
