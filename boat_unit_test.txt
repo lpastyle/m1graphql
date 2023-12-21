@@ -1,0 +1,97 @@
+#
+# Unit Tests for "boat" type
+# 
+
+mutation addSailBoat {
+  createBoat(
+    name: "La Licorne",
+    description: "An old sailboat property of captain Haddock ancestors",
+    type: SAILBOAT,
+    length: 21.5,
+    power: 100) {
+    id
+    name
+    description
+    type
+    length
+    power
+  }
+}
+
+mutation addYatch {
+  createBoat(
+    name: "Titanic",
+    description: "A liner reputed to be unsinkable",
+    type: YATCH,
+    length: 250.25,
+    power: 35000) {
+    id
+    name
+    description
+    type
+    length
+    power
+  }
+}
+
+mutation addJetski {
+  createBoat(
+    name: "Jetmaster",
+    description: "A very fast little scooter of the seas",
+    type: JETSKI,
+    length: 2.33,
+    power: 85) {
+    id
+    name
+    description
+    type
+    length
+    power
+  }
+}
+
+query showAllBoats {
+  boats {
+    id
+    name
+    description
+    type
+    length
+    power
+  }
+}
+
+query showBoatId_1 {
+  boat(id: "1") {
+    id
+    name
+    description
+    type
+    power
+  }
+}
+
+mutation updateBoatId_1 {
+  updateBoat(id: "1",
+    name: "La Licorne",
+    description: "An old sailboat property of captain Haddock ancestors",
+    type: SAILBOAT,
+    length: 51.58,
+    power: 10)
+}
+
+
+mutation deleteBoatId_1 {
+  deleteBoat(id: "1") 
+}
+
+
+query introspectionEnum {
+  __type(name: "BoatTypeEnum") {
+      name
+      kind
+      enumValues {
+        name
+      }
+  }
+}

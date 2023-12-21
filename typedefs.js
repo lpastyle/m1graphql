@@ -50,6 +50,33 @@ const UserType = new graphql.GraphQLObjectType({
     }
 });
 
+const BoatTypeEnum = new graphql.GraphQLEnumType({
+    name: "BoatTypeEnum",
+    values: {
+        YATCH: { value: 'yatch' },
+        CABIN: { value: ' cabin' },
+        CATAMARAN: { value: 'catamaran' },
+        SAILBOAT: { value: 'sailboat' },
+        JETSKI: { value: 'jetski ' },
+        CANOE: { value: 'canoe' }
+    }
+})
+
+//create graphql Boat object
+const BoatType = new graphql.GraphQLObjectType({
+    name: "Boat",
+    fields: {
+        id: { type: graphql.GraphQLID },
+        name: { type: graphql.GraphQLString },
+        description: { type: graphql.GraphQLString },
+        type: { type: BoatTypeEnum },
+        length: { type: graphql.GraphQLFloat },
+        power: { type: graphql.GraphQLInt }        
+    }
+});
+
+
+
 // create a graphql query to select all and by id
 var queryType = new graphql.GraphQLObjectType({
     name: 'Query',
@@ -81,6 +108,38 @@ var queryType = new graphql.GraphQLObjectType({
                 return new Promise((resolve, reject) => {
                 
                     database.all("SELECT * FROM users WHERE id = (?);",[id], function(err, rows) {                           
+                        if(err){
+                            reject(null);
+                        }
+                        resolve(rows[0]);
+                    });
+                });
+            }
+        },
+        boats: {
+            type: graphql.GraphQLList(BoatType),
+            resolve: (root, args, context, info) => {
+                return new Promise((resolve, reject) => {
+                    // raw SQLite query to select from table
+                    database.all("SELECT * FROM boats;", function(err, rows) {  
+                        if(err){
+                            reject([]);
+                        }
+                        resolve(rows);
+                    });
+                });
+            }
+        },
+        boat:{
+            type: BoatType,
+            args:{
+                id:{
+                    type: new graphql.GraphQLNonNull(graphql.GraphQLID)
+                }               
+            },
+            resolve: (root, {id}, context, info) => {
+                return new Promise((resolve, reject) => {
+                    database.all("SELECT * FROM boats WHERE id = (?);",[id], function(err, rows) {                           
                         if(err){
                             reject(null);
                         }
@@ -177,7 +236,8 @@ var mutationType = new graphql.GraphQLObjectType({
             })
         }
       },
-      //mutation for update
+
+      //mutation for delete
       deleteUser: {
          //type of object resturn after delete in SQLite
         type: graphql.GraphQLString,
@@ -197,7 +257,112 @@ var mutationType = new graphql.GraphQLObjectType({
                 });
             })
         }
-      }
+      },
+
+      createBoat: {
+        //type of object to return after create in SQLite
+        type: BoatType,
+        //argument of mutation createBoat to get from request
+        args: {
+          name: {
+            type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+          },
+          description:{
+              type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+          },
+          type:{
+              type: new graphql.GraphQLNonNull(BoatTypeEnum)
+          },
+          length:{
+              type: new graphql.GraphQLNonNull(graphql.GraphQLFloat)
+          },
+          power:{
+            type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
+          }
+        },
+        resolve: (root, {name, description, type, length, power}) => {
+            return new Promise((resolve, reject) => {
+                //raw SQLite to insert a new user in user table
+                database.run('INSERT INTO boats (name, description, type, length, power) VALUES (?,?,?,?,?);', [name, description, type, length, power], (err) => {
+                    if(err) {
+                        reject(null);
+                    }
+                    database.get("SELECT last_insert_rowid() as id", (err, row) => {
+                        
+                        resolve({
+                            id: row["id"],
+                            name: name,
+                            description: description,
+                            type: type,
+                            length: length,
+                            power: power
+                        });
+                    });
+                });
+            })
+        }
+      },
+
+      //mutation for update
+      updateBoat: {
+        //type of object to return afater update in SQLite
+        type: graphql.GraphQLString,
+        //argument of mutation updateBoat to get from request
+        args:{
+            id:{
+                type: new graphql.GraphQLNonNull(graphql.GraphQLID)
+            },
+            name: {
+                type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+            },
+            description:{
+                  type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+            },
+            type:{
+                  type: new graphql.GraphQLNonNull(BoatTypeEnum)
+            },
+            length:{
+                  type: new graphql.GraphQLNonNull(graphql.GraphQLFloat)
+            },
+            power: {
+                  type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
+            }             
+        },
+        resolve: (root, {id, name, description, type, length, power}) => {
+            return new Promise((resolve, reject) => {
+                // raw SQLite to update a users in user table
+                database.run('UPDATE boats SET name = (?), description = (?), type = (?), length = (?), power = (?) WHERE id = (?);', [name, description, type, length, power, id], (err) => {
+                    if(err) {
+                        reject(err);
+                    }
+                    resolve(`Boat #${id} updated`);
+                });
+            })
+        }
+      },
+
+      //mutation for delete
+      deleteBoat: {
+        //type of object return after delete in SQLite
+       type: graphql.GraphQLString,
+       args:{
+           id:{
+               type: new graphql.GraphQLNonNull(graphql.GraphQLID)
+           }               
+       },
+       resolve: (root, {id}) => {
+           return new Promise((resolve, reject) => {
+               //raw query to delete from boats table by id
+               database.run('DELETE from boats WHERE id =(?);', [id], (err) => {
+                   if(err) {
+                       reject(err);
+                   }
+                   resolve(`boat #${id} deleted`);                    
+               });
+           })
+       }
+     }
+
     }
 });
 

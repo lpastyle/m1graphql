@@ -1,5 +1,5 @@
 # m1graphql
-TP GraphQL info m1
+TP GraphQL Info m1
 
 # FISHER FANS API with GraphQL Example
 
