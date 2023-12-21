@@ -79,3 +79,22 @@ mutation updateUserId_1 {
 mutation deleteUserId_3 {
   deleteUser(id: "3")
 }
+
+query introspectionSchema {
+  __schema {
+    types {
+      name
+      kind
+    }
+  }
+}
+
+query introspectionEnum {
+  __type(name: "BoatTypeEnum") {
+      name
+      kind
+      enumValues {
+        name
+      }
+  }
+}
